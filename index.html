@@ -13,44 +13,45 @@
       div { horizontal-align: left; }
       body{ 
         font-family: Arial, Helvetica, sans-serif;
-         margin: 0;
-         background: #f0b090; 
-         text-align:center; 
-         padding: 20px;
+        margin: 0;
+        background: #f0b090; 
+        text-align:center; 
+        padding: 20px;
       }
-      // table, th, td { border: 1px solid black; }
-      table {
-        width: 100%
-        maxwidth: 390px; /* Sæt den maksimale bredde du ønsker */
-        boarder-collapse: collapse;
-        margin: 0 auto; /* Centrerer tabellen i din div */
-        display: block;
-        overflow-x: auto;
+      table, th, td { border: 2px solid black; table-layout: fixed; white-space: normal;}
+      .tb1{
+        width: 100%; max-width: 395px;
+        table-layout: fixed; white-space: normal;
+        border-collapse: collapse; /* Prevent double borders */
+        border-style: none;
       }
-      .tb { width: 100%; max-width: 390px; }
-      .tb1 { border-collapse: collapse; }
-      .tb2 { border-collapse: collapse; } //border: 1px solid black; }
-      th input, td input {
-        width: 100%;
-        max-width: 100%;
-        padding 8px;
-        font-size: 16px; /* Forhindrer iOS/Android i at zoome ind ved klik */
-        border: 1px solid #ccc;
-        border-radius: 4px;
+      .td1{
+        width: 36px;
+        max-width: 36px;
+        //heigth: 30px;
+        padding: 0px;
+        text-align: center;
+        border-style: solid;
       }
-      // td:nth-child(1), th:nth-child(1) {
-      //   width: 140px;
-      // }
-      th, td {
-        text-align: left;
-        padding: 6px;
-        vertical-align: middle;
-        border: 1px solid #ccc;
+      .td2{
+        width:auto;
+        max-width: 315px;
+        text-align: center;
+        border-style: solid;
       }
-      // input[type='number'] {
-      //   width: 40px;
-      //   text-align: center;
-      // } 
+      .tdleft{
+        width:36px;
+        max-width: 36px;
+        height:20px;
+      }
+      .tdright{
+        width:36px;
+        max-width: 36px;
+        height:20px;
+      }
+      .tdborder{
+        border-style: none;
+      }
       /* Styling for 2 cifre (ca. 4ch bredde pga. pile)  for input type number*/
       .w-2 { width: 40px; text-align: center; }
       .w-5 { width: 60px; text-align: center; }
@@ -58,12 +59,20 @@
       .container{ max-width:520px; margin:0 auto; padding:25px; }
       .card{
         background: white;
-        padding: 10px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 0px;
+        padding-right: 0px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         width: 100%;
         max-width: 395px;
         margin: 10px auto;
+      }
+      div.b {
+        background: #f0b090;
+        width: 100px;
+        height: 120px;
       }
       .btn{
         width: 250px;
@@ -75,7 +84,6 @@
         color:white;
         cursor:pointer;
       }
-      // .btn:hover{ background:#3400db; }
       .btn-on{ background:#2ecc71; }
       .btn-off{ background:#e74c3c; }
       .btn-all{ background:#3498db; } //#34495e; }
@@ -83,12 +91,8 @@
       .btn-nvs{ background:#3400db; }
       .locked{ opacity:0.45; cursor:not-allowed; }
       .gear{
-        position:fixed;
-        right:18px;
-        top:15px;
-        font-size:40px;
+        font-size: 18px; //24px;
         color:#000;
-        text-decoration:none;
       }
       .small{
         color:#888;
@@ -96,7 +100,6 @@
         margin-top:5px;
       }
       .BleInfo{
-        // color:#ff9999;
         color:#ff0000;
         font-size:16px;
         margin-top:15px;
@@ -146,16 +149,43 @@
       .statusvalue{ color:#3498db; text-align:right; font-weight: bold; word-break:break-word; }
       .statusvalue1{ color:#3498db; font-weight: bold; word-break:break-word; }
       .statusvalue2{ color:#3498db; padding-right: 10px; font-weight: bold; word-break:break-word; }
-      // .status-rod { background-color: #ffcccc; /* Lys rød */ color: #cc0000; }
-      // .status-gron { background-color: #d4edda; /* Lys grøn */ color: #155724; }      
+      .status{
+        font-weight: bold;
+        padding: 0;
+        margin: 2px 0;
+        color:blue; //#000;
+        line-height: 1.2;
+      }
+      .p1{
+        padding: 0;
+        margin: 4px 0;
+        line-height: 1.2;    /* 1.2 Mindre linjeafstand inden i afsnit */
+      }
     </style>
   </head>
 
 
   <body>
-    <a class='gear' onclick='initBluetooth()'>&#9881;</a>
     <div class="card">
-      <h1 id="main-title"> Antenne Kontrol </h1>
+      <div class="div.b">
+        <table class='tb1'>
+          <tr>
+            <td class='tdleft tdborder'></td>
+            <td class='td2 tdborder' rowspan='3'><h2 id="main-title"> Antenne Kontrol </h2></td>
+            <td class='tdleft tdborder'></td>
+          </tr>
+          <tr>
+            <td class='td1' bgcolor="Yellow"><a class='gear' onclick='gotowifi()'>Wifi</a></td>
+            <!--<td class='td2 tdborder' rowspan='2'><h1 id="main-title"> Antenne Kontrol </h1></td>-->
+            <td class='td1' bgcolor="Yellow"><a class='gear' onclick='initBluetooth()'>Pair</a></td>
+          </tr>
+          <tr>
+            <td class='tdright tdborder'></td>
+            <td class='tdright tdborder'></td>
+          </tr>
+        </table>
+      </div>
+
       <div id="relays-container">
         <button id='antBtn1' class='btn btn-off' onclick='selectAnt(1)'>Delta Loop 40m</button>
         <button id='antBtn2' class='btn btn-off' onclick='selectAnt(2)'>HF All band vertical</button> 
@@ -173,9 +203,9 @@
     </div>
     <div class="card">
       <h2>Sensor Status (ADC)</h2>
-      <p>Antenne Trace (4): <span id="adc0" class="status">0</span></p>
-      <p>Batteri spænding: <span id="battery" class="status">0</span></p>
-      <p>Batteri Status: <span id="batTxt" class="status"></span></p>
+      <p class="p1">Antenne Trace (4): <span id="adc0" class="status">0</span></p>
+      <p class="p1">Batteri spænding: <span id="battery" class="status">0</span></p>
+      <p class="p1">Batteri Status: <span id="batTxt" class="status"></span></p>
     </div>
 
     <script>
@@ -335,6 +365,7 @@
       function selectAnt(index) { sendBleKommando("TOGGLE;" + index); }
       function allOff() { sendBleKommando("ALLOFF"); }
       function ctrlInfo(index) { sendBleKommando("GETINFO;" + index); }
+      function gotowifi() { sendBleKommando("SWITCH_TO_WIFI"); }
 
       function onBleDisconnected() {
         let bs = document.getElementById('statusText');
