@@ -1,4 +1,4 @@
-const CACHE_NAME = 'offline-v1.1';
+const CACHE_NAME = 'offline-v2';
 const ASSETS = [
   './',
   './index.html', // Erstat med dit præcise filnavn hvis det ikke er index.html
