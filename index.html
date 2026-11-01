@@ -18,20 +18,52 @@
         text-align:center; 
         padding: 20px;
       }
-      table, th, td { border: 2px solid black; table-layout: fixed; white-space: normal;}
+      /*
+       table, th, td { 
+        border: 2px solid black;
+        table-layout: fixed;
+        white-space: normal;
+      }
+      */
       .tb1{
         width: 100%; max-width: 395px;
         table-layout: fixed; white-space: normal;
         border-collapse: collapse; /* Prevent double borders */
         border-style: none;
       }
+      table td {
+        vertical-align: middle; /* Centrerer knappen lodret */
+        padding: 0;             /* Giver luft omkring knappen */
+      }
+      /* Styling af selve knappen */
+      table td button {
+        background-color: red !important; /* Grøn */
+      }
+      .table-btn {
+        display: inline-block;
+        background-color: #4CAF50 !important; /* #4CAF50 Grøn */
+        color: white; /* white; */
+        width: 44px;
+        max-width: 44px;
+        height: 34px;
+        padding: 0;
+        margin: 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 1.2; /* Sikrer at teksten ikke hopper */
+      }
       .td1{
-        width: 36px;
-        max-width: 36px;
-        //heigth: 30px;
+        width: 44px;
+        max-width: 44px;
+        height: 34px;
         padding: 0px;
+        margin: 0;
         text-align: center;
-        border-style: solid;
+        /* border-style: solid; */
       }
       .td2{
         width:auto;
@@ -40,23 +72,18 @@
         border-style: solid;
       }
       .tdleft{
-        width:36px;
-        max-width: 36px;
+        width: 44px;
+        max-width: 44px;
         height:20px;
       }
       .tdright{
-        width:36px;
-        max-width: 36px;
+        width: 44px;
+        max-width: 44px;
         height:20px;
       }
       .tdborder{
         border-style: none;
       }
-      /* Styling for 2 cifre (ca. 4ch bredde pga. pile)  for input type number*/
-      .w-2 { width: 40px; text-align: center; }
-      .w-5 { width: 60px; text-align: center; }
-      /* Styling for 5 cifre (ca. 7ch bredde pga. pile)  for input type number*/
-      .container{ max-width:520px; margin:0 auto; padding:25px; }
       .card{
         background: white;
         padding-top: 10px;
@@ -86,12 +113,9 @@
       }
       .btn-on{ background:#2ecc71; }
       .btn-off{ background:#e74c3c; }
-      .btn-all{ background:#3498db; } //#34495e; }
-      .btn-cfg{ background:#3498db; }
-      .btn-nvs{ background:#3400db; }
-      .locked{ opacity:0.45; cursor:not-allowed; }
+      .btn-all{ background:#3498db; }
       .gear{
-        font-size: 18px; //24px;
+        font-size: 18px; /* 24px; */
         color:#000;
       }
       .small{
@@ -105,55 +129,17 @@
         margin-top:15px;
       }
       .warning{
-        // color:#ff9999;
+        /* color:#ff9999; */
         color:#ff0000;
         font-size:16px;
         margin-top:15px;
         display:none;
       }
-      label{
-        display:block;
-        text-align:left;
-        color:#000; //#bbb;
-        margin-top:8px;
-      }
-      .checkboxline{
-        display:flex;
-        align-items:center;
-        gap:12px;
-        margin:5px 0 5px 0;
-        color:#000; // #bbb;
-      }
-      .checkboxline input{
-        width:auto;
-        margin:0;
-      }
-      .statusbox{
-        background:#ffffff; //#1a1a1a;
-        border:1px solid #444;
-        border-radius:8px;
-        padding:10px;
-        margin:14px 0 24px 0;
-        text-align:left;
-      }
-      .statusrow{
-        display:flex;
-        justify-content:space-between;
-        // gap:12px;
-        border-bottom:1px solid #333;
-        padding:10px 0;
-        font-size:15px;
-      }
-      .statusrow:last-child{ border-bottom:none; }
-      .statuslabel{ color:#000; //#aaa; }
-      .statusvalue{ color:#3498db; text-align:right; font-weight: bold; word-break:break-word; }
-      .statusvalue1{ color:#3498db; font-weight: bold; word-break:break-word; }
-      .statusvalue2{ color:#3498db; padding-right: 10px; font-weight: bold; word-break:break-word; }
       .status{
         font-weight: bold;
         padding: 0;
         margin: 2px 0;
-        color:blue; //#000;
+        color:blue; /* #000; */
         line-height: 1.2;
       }
       .p1{
@@ -175,9 +161,8 @@
             <td class='tdleft tdborder'></td>
           </tr>
           <tr>
-            <td class='td1' bgcolor="Yellow"><a class='gear' onclick='gotowifi()'>Wifi</a></td>
-            <!--<td class='td2 tdborder' rowspan='2'><h1 id="main-title"> Antenne Kontrol </h1></td>-->
-            <td class='td1' bgcolor="Yellow"><a class='gear' onclick='initBluetooth()'>Pair</a></td>
+            <td class='td1'><button class='table-btn' onclick='gotowifi()'>WiFi</button></td>
+            <td class='td1'><button class='table-btn' onclick='initBluetooth()'>Pair</button></td>
           </tr>
           <tr>
             <td class='tdright tdborder'></td>
@@ -203,7 +188,7 @@
     </div>
     <div class="card">
       <h2>Sensor Status (ADC)</h2>
-      <p class="p1">Antenne Trace (4): <span id="adc0" class="status">0</span></p>
+      <p class="p1">Antenne Trace: <span id="adc0" class="status">0</span></p>
       <p class="p1">Batteri spænding: <span id="battery" class="status">0</span></p>
       <p class="p1">Batteri Status: <span id="batTxt" class="status"></span></p>
     </div>
@@ -265,15 +250,6 @@
 
           const felter = rawString.split(';');
           const datatype = felter[0];
-
-          // Håndtering af Titlerne
-          // if (datatype === "TITL") {
-          //   if (felter[1]){
-          //     document.title = felter[1];
-          //     let b = document.getElementById('main-title');
-          //     if (b) b.innerText = " " + felter[1] + " ";
-          //   }
-          // }
           
           // Håndtering af antennenavne (Overskriver knappernes tekst live)
           if (datatype === "NAME") {
