@@ -161,8 +161,8 @@
             <td class='tdleft tdborder'></td>
           </tr>
           <tr>
-            <td class='td1'><button class='table-btn' onclick='gotowifi()'>WiFi</button></td>
-            <td class='td1'><button class='table-btn' onclick='initBluetooth()'>Pair</button></td>
+            <td class='td1'><button id='WifiBtn' class='table-btn' onclick='gotowifi()'>WiFi</button></td>
+            <td class='td1'><button id='BlePair' class='table-btn' onclick='initBluetooth()'>Pair</button></td>
           </tr>
           <tr>
             <td class='tdright tdborder'></td>
@@ -171,14 +171,19 @@
         </table>
       </div>
 
-      <div id="relays-container">
+      <!-- Advarselsboks - skjult som standard via display:none -->
+      <div id="browser-warning" style="display: none; background-color: #ffe6e6; color: #b30000; border: 1px solid #ffb3b3; padding: 15px; margin: 15px 0; border-radius: 5px; font-family: sans-serif;">
+        <strong style="font-size: 16px;">⚠️ Bemærk venligst:</strong>
+        <p id="warning-text" style="margin: 8px 0 0 0; line-height: 1.4;"></p>
+      </div>
+
+      <div id="relaysContainer">
         <button id='antBtn1' class='btn btn-off' onclick='selectAnt(1)'>Antenne 1</button>
         <button id='antBtn2' class='btn btn-off' onclick='selectAnt(2)'>Antenne 2</button> 
         <button id='antBtn3' class='btn btn-off' onclick='selectAnt(3)'>Antenne 3</button> 
         <button id='antBtn4' class='btn btn-off' onclick='selectAnt(4)'>Antenne 4</button>
-      </div>
         <button id='offBtn' class='btn btn-all' onclick='allOff()'>SLUK ALLE</button>
-<!--        <button id='conBtn' class='btn btn-all' onclick='initBluetooth()'>Forbind BLE</button> -->
+      </div>
     </div>
     <div class="card">
       <h2>Status (SYSTEM)</h2>
@@ -198,6 +203,12 @@
       let bleDevice = null;
       let rxCharacteristic = null; // Send til ESP32
       let txCharacteristic = null; // Modtag fra ESP32
+      let harBleFejl = false; // udgangspunkt ingen fejl omkring BLE
+
+      const warningBox = document.getElementById('browser-warning');
+      const warningText = document.getElementById('warning-text');
+      const connectBtn = document.getElementById('BlePair'); // Sørg for at dette ID matcher din knap
+      const relayBlock = document.getElementById('relaysContainer');
 
       // UUIDs - Skal matche ESP32 koden nøjagtigt
       const SERVICE_UUID           = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
@@ -217,6 +228,8 @@
             filters: [{ services: [SERVICE_UUID] }]
           });
 
+          if (!bleDevice) return;
+          
           const server = await bleDevice.gatt.connect();
           const service = await server.getPrimaryService(SERVICE_UUID);
 
@@ -235,6 +248,14 @@
             sendBleKommando("GET_INITIAL_DATA");
           }, 300);
 
+          let wfbtn = document.getElementById('WifiBtn');
+          
+          // luk op for WiFi knappen
+          if (wfbtn) wfbtn.disabled = false;
+          if (relayBlock) relayBlock.style.display = "block";
+          if (connectBtn) connectBtn.disabled = false;
+          if (warningBox) warningBox.style.display = "none";
+          
         } catch (error) {
           console.error("Bluetooth fejl: ", error);
           document.getElementById('statusText').innerText = "Forbindelse fejlede.";
@@ -341,10 +362,21 @@
       function selectAnt(index) { sendBleKommando("TOGGLE;" + index); }
       function allOff() { sendBleKommando("ALLOFF"); }
       function ctrlInfo(index) { sendBleKommando("GETINFO;" + index); }
-      function gotowifi() { sendBleKommando("SWITCH_TO_WIFI"); }
+      function gotowifi() { 
+        warningText.innerHTML = "Du har nu skiftet tilbage til WiFi, derfor virker denne browser ikke, før du har skiftet tilbage til BlueTooth!";
+        warningBox.style.display = "block";
+        if (relayBlock) relayBlock.style.display = "none";
+
+        sendBleKommando("SWITCH_TO_WIFI"); 
+      }
 
       function onBleDisconnected() {
         let bs = document.getElementById('statusText');
+        let wfbtn = document.getElementById('WifiBtn');
+
+        if (wfbtn) {
+          wfbtn.disabled = true;
+        }
         if (bs) {
           bs.innerText = "Forbindelse afbrudt. Klik for at forbinde.";
           bs.classList = 'BleInfo';
@@ -352,18 +384,56 @@
       }
 
       window.onload = function() {
+        let wfbtn = document.getElementById('WifiBtn');
         let bs = document.getElementById('statusText');
-        if (bs) {
+        if (wfbtn) {
+          wfbtn.disabled = true;
+        }
+        if (bs && !harBleFejl) {
           bs.innerText = "Klar til Bluetooth-forbindelse.";
           bs.classList = 'BleInfo';
         }
       };
 
+      window.addEventListener('DOMContentLoaded', () => {
+        const bs = document.getElementById('statusText');
+
+        const userAgent = navigator.userAgent || '';
+        const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+        const isSamsung = /SamsungBrowser/.test(userAgent);
+
+        if (isIOS) {
+          warningText.innerHTML = "Apple tillader ikke Bluetooth i standard-browsere (Chrome/Safari). For at bruge denne app på din iPhone/iPad, skal du hente den gratis app <strong>'Bluefy'</strong> i App Store og åbne dette link derinde.";
+          warningBox.style.display = "block";
+          if (relayBlock) relayBlock.style.display = "none";
+          if (connectBtn) connectBtn.disabled = true;
+          if (bs) {
+            bs.innerText = "Ingen Bluetooth adgang!";
+            bs.classList = 'BleInfo';
+            harBleFejl = true; // <--- HUSK FEJLEN
+          }
+        } 
+        else if (isSamsung) {
+          warningText.innerHTML = "Du bruger Samsung Internet, som ofte blokerer for Bluetooth-forbindelsen. Vi anbefaler kraftigt, at du åbner dette link i <strong>Google Chrome</strong> eller <strong>Microsoft Edge</strong> i stedet for at undgå fejl.";
+          warningBox.style.display = "block";
+        } 
+        else if (!navigator.bluetooth) {
+          warningText.innerHTML = "Denne browser understøtter ikke Web Bluetooth, eller Bluetooth er deaktiveret på din enhed. Skift venligst til en opdateret udgave af <strong>Google Chrome</strong> eller <strong>Microsoft Edge</strong>.";
+          warningBox.style.display = "block";
+          if (relayBlock) relayBlock.style.display = "none";
+          if (connectBtn) connectBtn.disabled = true;
+          if (bs) {
+            bs.innerText = "Ingen Bluetooth adgang!";
+            bs.classList = 'BleInfo';
+            harBleFejl = true; // <--- HUSK FEJLEN
+          }
+        }
+      });
+
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('./sw.js')
           .then(() => console.log('Service Worker Registreret!'));
       }
-
     </script>
     
   </body>
