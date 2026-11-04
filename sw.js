@@ -1,4 +1,4 @@
-const CACHE_NAME = 'offline-v3'; // <--- Husk at tælle denne op (v3, v4 osv.) når du ændrer index.html
+const CACHE_NAME = 'offline-v4'; // <--- Husk at tælle denne op (v3, v4 osv.) når du ændrer index.html
 const ASSETS = [
   './',
   './index.html',
