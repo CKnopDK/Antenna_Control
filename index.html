@@ -4,7 +4,7 @@
   <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Antenne Kontrol</title>
+    <title>Antenne Kontrol BLE</title>
     <style>
       /* Sørger for at padding og border ikke lægges oveni bredden */
       *, *::before, *::after {
@@ -343,6 +343,10 @@
             if(document.getElementById('battery')) document.getElementById('battery').innerText = felter[1];
             if(document.getElementById('batTxt'))  document.getElementById('batTxt').innerText = felter[2];
           }
+          
+          if (datatype === "BATT") {
+            if(document.getElementById('batTxt'))  document.getElementById('batTxt').innerText = felter[2];
+          }
 
         } catch (e) {
           console.error("Fejl i data-parsing: ", e);
@@ -350,11 +354,30 @@
       }
 
       // 3. Send kommandoer til ESP32
-      function sendBleKommando(kommando) {
-        if (rxCharacteristic) {
+      async function sendBleKommando(kommando) {
+        if (!rxCharacteristic) return;
+        
+        try{
           const encoder = new TextEncoder();
           const buffer = encoder.encode(kommando);
-          rxCharacteristic.writeValue(buffer).catch(err => console.error("Send fejl:", err));
+          console.log("Sender kommando:", kommando);
+          
+          await rxCharacteristic.writeValue(buffer);
+          
+          if(kommando === "SWITCH_TO_WIFI"){
+            console.log("WiFi-kommando sendt. Venter kort, og lukker BLE pænt...");
+            await new Promise(resolve => setTimeout(resolve, 150));
+            
+            if(bleDevice && bleDevice.gatt.connected){
+              await bleDevice.gatt.disconnect();
+            }
+          }
+        }catch(err){
+          if(kommando === "SWITCH_TO_WIFI" && (err.name === 'NotSupportedError' || err.message.includes('GATT'))){
+            console.log("ESP32 afbrød som forventet under WiFi-skift.");
+          }else{
+            console.error("Send fejl:", err);
+          }
         }
       }
 
@@ -362,12 +385,13 @@
       function selectAnt(index) { sendBleKommando("TOGGLE;" + index); }
       function allOff() { sendBleKommando("ALLOFF"); }
       function ctrlInfo(index) { sendBleKommando("GETINFO;" + index); }
-      function gotowifi() { 
+      
+      async function gotowifi() {
         warningText.innerHTML = "Du har nu skiftet tilbage til WiFi, derfor virker denne browser ikke, før du har skiftet tilbage til BlueTooth!";
         warningBox.style.display = "block";
         if (relayBlock) relayBlock.style.display = "none";
 
-        sendBleKommando("SWITCH_TO_WIFI"); 
+        await sendBleKommando("SWITCH_TO_WIFI");
       }
 
       function onBleDisconnected() {
